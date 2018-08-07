@@ -1,12 +1,18 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
+	"os"
 )
 
 func main() {
+	cur, _ := os.Getwd()
+	fmt.Println("Current directory: ", cur)
+
 	mux := http.NewServeMux()
+	files := http.FileServer(http.Dir("./public"))
+	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/", index)
 
 	server := &http.Server{
@@ -17,5 +23,5 @@ func main() {
 }
 
 func index(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "Hello GoServer!")
+	fmt.Fprintf(writer, "Hello %s", request.URL.Path)
 }
